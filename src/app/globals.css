@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+
+html {
+  font-family: 'Tajawal', sans-serif; 
+  direction: rtl;
+  text-align: right;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -14,8 +21,18 @@
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+* {
+  box-sizing: border-box;
 }
+
+body {
+  direction: rtl; 
+  text-align: right;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
+}
+
