@@ -2,8 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import  Loading  from "../../../components/Loading/Loading";
-
+import Loading from "@/components/Loading/Loading"; 
 interface PatientData {
     nationalId: string;
     fullName: string;

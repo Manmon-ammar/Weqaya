@@ -21,7 +21,7 @@ interface InputField {
         onBlur={formik.handleBlur}
         placeholder={label}
         aria-invalid={formik.errors[name] && formik.touched[name] ? "true" : "false"}
-        className="w-full p-2 border rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
+        className="w-full p-2 rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
         />
         {formik.errors[name] && formik.touched[name] && (
         <p className="text-red-500 text-sm">{formik.errors[name]}</p>
@@ -93,7 +93,7 @@ interface InputField {
             name="nationalId"
             value={formik.values.nationalId}
             readOnly
-            className="w-full p-2 border rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
+            className="w-full p-2 rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
         />
 
         {[
@@ -112,7 +112,7 @@ interface InputField {
             value={formik.values.takingMedication}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="w-full p-2 border rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
+            className="w-full p-2 rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
         >
             <option value="">هل يتناول المريض أدوية؟</option>
             <option value="نعم">نعم</option>
@@ -130,7 +130,7 @@ interface InputField {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             placeholder="كيف تؤثر الشكوى على حياتك اليومية؟"
-            className="w-full p-2 border rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
+            className="w-full p-2 rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
         ></textarea>
 
         <textarea
@@ -139,7 +139,7 @@ interface InputField {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             placeholder="أي معلومات إضافية"
-            className="w-full p-2 border rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
+            className="w-full p-2 rounded focus:outline-none border-2 border-gray-300 focus:border-blue-600"
         ></textarea>
 
         <button
