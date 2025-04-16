@@ -3,6 +3,7 @@
 import { useFormik } from "formik";
 import { number, object, string, array, boolean } from "yup";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Register() {
     const [step, setStep] = useState(0);
@@ -38,10 +39,10 @@ export default function Register() {
         isMedicalSyndicateMember: boolean(),
         syndicateNumber: string().nullable(),
         medicalSpecialties: array().of(string()),
-        supportingDocuments: array().of(string()),
+        supportingDocuments: string().nullable(),
         workEmail: string().email("البريد الإلكتروني غير صالح").nullable(),
         workingHours: string().nullable(),
-        contactMethods: array().of(string()),
+        contactMethods: string().nullable(),
     });
     
     const formik = useFormik({
@@ -222,31 +223,44 @@ export default function Register() {
                     <p className="text-red-500 m-1">{formik.errors.gender}</p>
                 )}
             </div>
-            <button
-            onClick={async () => {
-                // تحديد أن جميع الحقول قد تم لمسها
-                formik.setTouched({
-                fullName: true,
-                phone: true,
-                password: true,
-                age: true,
-                address: true,
-                nationalID: true,
-                gender: true,
-                });
+                <button
+    onClick={async () => {
+        formik.setTouched({
+        fullName: true,
+        phone: true,
+        password: true,
+        age: true,
+        address: true,
+        nationalID: true,
+        gender: true,
+        });
 
-                // التحقق من صحة البيانات
-                await formik.validateForm(); // نتحقق من الصحة أولاً
+        const errors = await formik.validateForm();
 
-                // إذا كانت البيانات صحيحة، ننتقل إلى الخطوة التالية
-                if (formik.isValid) {
-                setStep(2);
-                }
-            }}
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-            >
-            التالي
-            </button>
+        const step2Fields = [
+        "fullName",
+        "phone",
+        "password",
+        "age",
+        "address",
+        "nationalID",
+        "gender",
+        ];
+
+        const hasStep2Errors = step2Fields.some(
+            (field) => errors[field as keyof typeof errors]
+        );
+        
+        if (!hasStep2Errors) {
+        setStep(2);
+        }
+    }}
+    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+    >
+    التالي
+    </button>
+
+
             </div>
         )}
 
@@ -297,7 +311,45 @@ export default function Register() {
             />
             {formik.touched.profileImage && formik.errors.profileImage && <p className="text-red-500 m-1">{formik.errors.profileImage}</p>}
             </div>
-            <button type="submit" className="mt-4 bg-green-500 text-white px-4 py-2 rounded">تسجيل</button>
+            <button
+            type="button"
+            onClick={async () => {
+                const fieldsToTouch = [
+                "experienceYears",
+                "profileDescription",
+                "cvFile",
+                "profileImage",
+                ];
+
+                // لمس الحقول
+                formik.setTouched(
+                fieldsToTouch.reduce((acc, field) => {
+                    acc[field] = true;
+                    return acc;
+                }, {} as Record<string, boolean>)
+                );
+
+                const errors = await formik.validateForm();
+
+                const hasErrors = fieldsToTouch.some(
+                (field) => errors[field as keyof typeof errors]
+                );
+
+                if (!hasErrors) {
+                // محاكاة تسجيل/API delay
+                await new Promise((res) => setTimeout(res, 500));
+
+                toast.success("تم تسجيل الموظف بنجاح ✅");
+
+                formik.resetForm();
+                setStep(0);
+                setRole("");
+                }
+            }}
+            className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
+            >
+            تسجيل
+            </button>            
             </div>
         )}
 
@@ -374,7 +426,7 @@ export default function Register() {
                 <label className="block mb-2 text-sm font-medium">مسجل في نقابة الأطباء؟</label>
                 <select
                     name="isMedicalSyndicateMember"
-                    value={formik.values.isMedicalSyndicateMember ? "true" : "false"} // تحويل boolean إلى string
+                    value={formik.values.isMedicalSyndicateMember ? "true" : "false"}
                     onChange={(e) => {
                     const value = e.target.value === "true";
                     formik.setFieldValue("isMedicalSyndicateMember", value);
@@ -404,14 +456,23 @@ export default function Register() {
             <div>
             <input
                 type="text"
-                placeholder="التخصصات الطبية"
-                {...formik.getFieldProps("medicalSpecialties")}
+                placeholder="التخصصات الطبية (مثال: باطنة، جراحة، قلب)"
+                value={formik.values.medicalSpecialties.join(", ")}
+                onChange={(e) => {
+                const value = e.target.value
+                    .split(",")
+                    .map((item) => item.trim())
+                    .filter((item) => item.length > 0);
+                formik.setFieldValue("medicalSpecialties", value);
+                }}
+                onBlur={() => formik.setFieldTouched("medicalSpecialties", true)}
                 className="border border-gray-300 focus:border-gray-400 focus:outline-none p-2 w-full rounded"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
             />
-            {formik.touched.medicalSpecialties && formik.errors.medicalSpecialties && <p className="text-red-500 m-1">{formik.errors.medicalSpecialties}</p>}
+            {formik.touched.medicalSpecialties && formik.errors.medicalSpecialties && (
+                <p className="text-red-500 m-1">{formik.errors.medicalSpecialties}</p>
+            )}
             </div>
+
             <div>
             <input
                 type="file"
@@ -489,7 +550,66 @@ export default function Register() {
             />
             {formik.touched.profileDescription && formik.errors.profileDescription && <p className="text-red-500 m-1">{formik.errors.profileDescription}</p>}
             </div>
-            <button type="submit" className="mt-4 bg-green-500 text-white px-4 py-2 rounded">تسجيل</button>
+            <button
+            type="button"
+            onClick={async () => {
+                const fieldsToTouch =
+            (role as "doctor" | "employee") === "employee"
+                ? [
+                    "experienceYears",
+                    "profileDescription",
+                    "cvFile",
+                    "profileImage",
+                ]
+                : [
+                    "university",
+                    "specialization",
+                    "currentWorkplace",
+                    "workplaceAddress",
+                    "licenseNumber",
+                    "licenseIssuer",
+                    "isMedicalSyndicateMember",
+                    "syndicateNumber",
+                    "medicalSpecialties",
+                    "supportingDocuments",
+                    "workEmail",
+                    "workingHours",
+                    "contactMethods",
+                    "cvFile",
+                    "profileImage",
+                    "profileDescription",
+                ];
+
+
+                formik.setTouched(
+                fieldsToTouch.reduce((acc, field) => {
+                    acc[field] = true;
+                    return acc;
+                }, {} as Record<string, boolean>)
+                );
+
+                const errors = await formik.validateForm();
+
+                const hasErrors = fieldsToTouch.some(
+                (field) => errors[field as keyof typeof errors]
+                );
+
+                if (!hasErrors) {
+                // Simulate API or delay
+                await new Promise((res) => setTimeout(res, 500));
+
+                toast.success("تم تسجيل الطبيب بنجاح ✅");
+
+                // Reset form + العودة لأول خطوة
+                formik.resetForm();
+                setStep(0);
+                setRole("");
+                }
+            }}
+            className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
+            >
+            تسجيل
+            </button>
             </div>
         )}
         </div>
